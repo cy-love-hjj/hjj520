@@ -238,6 +238,101 @@
     font-weight: 600;
   }
 
+  /* ---- 照片弹窗 ---- */
+  .photo-popup-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s;
+  }
+  .photo-popup-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .photo-popup {
+    background: #fff;
+    border-radius: 24px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    max-width: 90vw;
+    width: 360px;
+    position: relative;
+    animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .photo-popup .close-btn {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ff2d55;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 30px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(255,45,85,0.4);
+  }
+
+  .photo-popup img {
+    width: 100%;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    max-height: 60vh;
+    object-fit: contain;
+  }
+
+  .photo-popup .photo-label {
+    font-size: 14px;
+    color: #e8456b;
+    font-weight: 600;
+  }
+
+  /* ---- 音乐按钮 ---- */
+  .music-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 30;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid #ffccd5;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(255,105,135,0.15);
+  }
+  .music-btn:hover { transform: scale(1.08); }
+  .music-btn.playing {
+    border-color: #ff6b81;
+    animation: musicPulse 2s ease-in-out infinite;
+  }
+  @keyframes musicPulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255,105,135,0.15); }
+    50% { box-shadow: 0 4px 28px rgba(255,105,135,0.4); }
+  }
+
   /* ---- 响应式 ---- */
   @media (max-width: 420px) {
     .card { padding: 36px 24px 28px; }
@@ -249,6 +344,7 @@
 <body>
 
 <div class="hearts-container" id="heartsContainer"></div>
+<button class="music-btn" id="musicBtn" onclick="toggleMusic(event)" title="音乐">🎵</button>
 
 <main class="card" id="card">
   <!-- Hello Kitty SVG -->
@@ -290,9 +386,9 @@
       <line x1="70" y1="122" x2="22" y2="129" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>
 
       <!-- 右胡须 -->
-      <line x1="130" y1="97" x2="178" y2="104" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="130" y1="104" x2="178" y2="97" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>
       <line x1="130" y1="113" x2="182" y2="113" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>
-      <line x1="130" y1="129" x2="178" y2="122" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="130" y1="122" x2="178" y2="129" stroke="#888" stroke-width="1.8" stroke-linecap="round"/>
 
       <!-- 腮红 -->
       <ellipse cx="58" cy="115" rx="10" ry="6" fill="#ffd1dc" opacity="0.5"/>
@@ -306,13 +402,22 @@
 
   <div class="btn-row">
     <button class="btn btn-primary" onclick="showPopup(event)">点我 💌</button>
-    <button class="btn btn-secondary" onclick="refloatHearts()">再来一波小心心 💕</button>
+    <button class="btn btn-secondary" onclick="showPigPopup(event)">查看养猪秘诀 🐷</button>
   </div>
 
   <div class="footer-decor">
     🎀 🐱 🌸 🎀 🐱 🌸
   </div>
 </main>
+
+<!-- 照片弹窗 -->
+<div class="photo-popup-overlay" id="photoPopupOverlay" onclick="hidePigPopup()">
+  <div class="photo-popup" onclick="event.stopPropagation()">
+    <button class="close-btn" onclick="hidePigPopup()">✕</button>
+    <img src="photo.jpg" alt="养猪秘诀 🐷">
+    <p class="photo-label">🐷 我养的猪，谁也别想抢走 💖</p>
+  </div>
+</div>
 
 <!-- 弹窗 -->
 <div class="popup-overlay" id="popupOverlay" onclick="hidePopup()">
@@ -412,6 +517,104 @@
   function hidePopup() {
     document.getElementById('popupOverlay').classList.remove('show');
   }
+
+  // ---- 照片弹窗 ----
+  function showPigPopup(event) {
+    event.stopPropagation();
+    document.getElementById('photoPopupOverlay').classList.add('show');
+    burstHearts(event.clientX, event.clientY, 12);
+  }
+
+  function hidePigPopup() {
+    document.getElementById('photoPopupOverlay').classList.remove('show');
+  }
+
+  // ---- 音乐播放器 ----
+  let audioCtx = null;
+  let musicPlaying = false;
+  let musicTimer = null;
+  const musicBtn = document.getElementById('musicBtn');
+
+  // 音乐盒风格旋律音符 (C5-D5-E5-G5-A5 五声音阶)
+  const notes = [
+    { freq: 659.25, dur: 0.4 },  // E5
+    { freq: 587.33, dur: 0.4 },  // D5
+    { freq: 523.25, dur: 0.4 },  // C5
+    { freq: 587.33, dur: 0.4 },  // D5
+    { freq: 659.25, dur: 0.4 },  // E5
+    { freq: 659.25, dur: 0.3 },  // E5
+    { freq: 783.99, dur: 0.3 },  // G5
+    { freq: 880.00, dur: 0.5 },  // A5
+    { freq: 783.99, dur: 0.3 },  // G5
+    { freq: 659.25, dur: 0.4 },  // E5
+    { freq: 587.33, dur: 0.4 },  // D5
+    { freq: 523.25, dur: 0.6 },  // C5
+    { freq: 0,      dur: 0.3 },  // rest
+  ];
+
+  function playNote(freq, dur) {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.15, now + 0.03);
+    gain.gain.linearRampToValueAtTime(0.08, now + dur * 0.6);
+    gain.gain.linearRampToValueAtTime(0, now + dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + dur + 0.05);
+  }
+
+  function playMelody() {
+    if (!musicPlaying) return;
+    let delay = 0;
+    notes.forEach(n => {
+      if (n.freq > 0) {
+        setTimeout(() => playNote(n.freq, n.dur), delay * 1000);
+      }
+      delay += n.dur;
+    });
+    // 循环播放，留一小段间隔
+    const totalDur = notes.reduce((s, n) => s + n.dur, 0);
+    musicTimer = setTimeout(playMelody, (totalDur + 0.6) * 1000);
+  }
+
+  function startMusic() {
+    if (musicPlaying) return;
+    musicPlaying = true;
+    musicBtn.textContent = '🎶';
+    musicBtn.classList.add('playing');
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    playMelody();
+  }
+
+  function stopMusic() {
+    musicPlaying = false;
+    musicBtn.textContent = '🎵';
+    musicBtn.classList.remove('playing');
+    if (musicTimer) clearTimeout(musicTimer);
+  }
+
+  function toggleMusic(event) {
+    event.stopPropagation();
+    if (musicPlaying) {
+      stopMusic();
+    } else {
+      startMusic();
+    }
+  }
+
+  // 首次交互时自动开始音乐（遵循浏览器自动播放策略）
+  let musicAutoStarted = false;
+  document.addEventListener('click', function autoStart() {
+    if (musicAutoStarted) return;
+    musicAutoStarted = true;
+    startMusic();
+  }, { once: false });
 
   // ---- 移动端触摸滑动时的小尾巴 ----
   let touchTrailTimer = null;
