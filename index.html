@@ -3,607 +3,381 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hi 小何 💖</title>
+<title>For 小何 💖</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  :root {
+    --pink: #ff7b9c;
+    --pink-light: #ffb8cc;
+    --peach: #ffb088;
+    --bg-top: #fff0f3;
+    --bg-mid: #ffe8f0;
+    --bg-end: #ffe0ec;
+  }
+
   body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #ffe4ec 0%, #ffd1dc 30%, #ffe0f0 60%, #ffdae9 100%);
+    background: linear-gradient(180deg, #fff0f3 0%, #ffe4ee 30%, #ffdce8 60%, #ffe0ec 100%);
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
-    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-    overflow: hidden;
-    cursor: default;
+    padding: 24px 16px 60px;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
+    cursor: default;
   }
 
-  /* ---- 飘落的小心心 ---- */
-  .hearts-container {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
+  /* ---- 云朵装饰 ---- */
+  .clouds {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
   }
-
-  @keyframes floatUp {
-    0%   { transform: translateY(110vh) rotate(0deg) scale(0.5); opacity: 1; }
-    80%  { opacity: 0.8; }
-    100% { transform: translateY(-10vh) rotate(360deg) scale(1.4); opacity: 0; }
-  }
-
-  .floating-heart {
+  .cloud {
     position: absolute;
-    bottom: -60px;
-    font-size: 28px;
-    animation: floatUp 7s linear infinite;
+    background: rgba(255,255,255,0.55);
+    border-radius: 50%;
+    animation: drift linear infinite;
+  }
+  @keyframes drift {
+    0% { transform: translateX(-120px); }
+    100% { transform: translateX(calc(100vw + 120px)); }
+  }
+  .cloud::before, .cloud::after {
+    content: ''; position: absolute; background: inherit; border-radius: 50%;
   }
 
-  /* ---- 点击爆发的小心心 ---- */
-  @keyframes burstOut {
-    0%   { transform: translate(0, 0) scale(0); opacity: 1; }
-    50%  { opacity: 1; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
+  /* ---- 飘落小心心 ---- */
+  @keyframes fall {
+    0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+  }
+  .falling-heart {
+    position: fixed; pointer-events: none; z-index: 1;
+    font-size: 22px;
+    animation: fall linear infinite;
   }
 
-  .burst-heart {
-    position: fixed;
-    pointer-events: none;
-    font-size: 24px;
-    z-index: 20;
-    animation: burstOut 1s ease-out forwards;
+  /* ---- 主容器 ---- */
+  .main-wrap {
+    position: relative; z-index: 2;
+    width: 100%; max-width: 400px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 20px;
   }
 
-  /* ---- 主卡片 ---- */
-  .card {
-    position: relative;
-    z-index: 1;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 32px;
-    padding: 48px 40px 40px;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(255, 105, 135, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.6);
-    animation: cardFloat 4s ease-in-out infinite;
-    transition: transform 0.1s;
+  /* ---- 头部 ---- */
+  .header {
+    text-align: center; margin-bottom: 4px;
   }
-
-  @keyframes cardFloat {
+  .header .icon-row { font-size: 36px; margin-bottom: 4px; animation: bounce 2s ease-in-out infinite; }
+  @keyframes bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
   }
-
-  /* ---- SVG Kitty ---- */
-  .kitty-wrapper {
-    width: 180px;
-    height: 180px;
-    margin: 0 auto 20px;
-    cursor: pointer;
-    transition: transform 0.15s;
-    position: relative;
-  }
-  .kitty-wrapper:active {
-    transform: scale(0.92);
-  }
-  .kitty-wrapper.wiggle {
-    animation: wiggle 0.5s ease-in-out;
-  }
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(0); }
-    20% { transform: rotate(-8deg); }
-    40% { transform: rotate(8deg); }
-    60% { transform: rotate(-6deg); }
-    80% { transform: rotate(6deg); }
-  }
-
-  .kitty-wrapper svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* 点击计数提示 */
-  .tap-hint {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ff2d55;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 20px;
-    opacity: 0;
-    transform: scale(0);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .tap-hint.show {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* ---- 文案 ---- */
-  .greeting {
-    font-size: 15px;
-    color: #e8889a;
+  .header h1 {
+    font-size: 26px; font-weight: 800; color: #e8456b;
     letter-spacing: 2px;
-    margin-bottom: 8px;
+    text-shadow: 0 2px 8px rgba(232,69,107,0.15);
+  }
+  .header .sub {
+    font-size: 13px; color: #d49ba8; margin-top: 2px; letter-spacing: 1px;
   }
 
-  .message {
-    font-size: 28px;
-    font-weight: 700;
-    color: #e8456b;
-    line-height: 1.5;
-    margin-bottom: 8px;
-    text-shadow: 0 2px 8px rgba(232, 69, 107, 0.12);
-  }
-
-  .sub-message {
-    font-size: 13px;
-    color: #d49ba8;
-    margin-bottom: 16px;
-  }
-
-  /* ---- 按钮 ---- */
-  .btn-row {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    padding: 12px 28px;
-    border-radius: 50px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    letter-spacing: 1px;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .btn:active {
-    transform: scale(0.94);
-    transition-duration: 0.08s;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #ff6b81, #ff3b5c);
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(255, 59, 92, 0.4);
-  }
-  .btn-primary:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 10px 32px rgba(255, 59, 92, 0.55);
-  }
-
-  .btn-secondary {
-    background: #fff;
-    color: #ff6b81;
-    border: 2px solid #ffccd5;
-  }
-  .btn-secondary:hover {
-    background: #fff5f7;
-    border-color: #ff6b81;
-    transform: translateY(-2px) scale(1.03);
-  }
-
-  /* ---- 底部 ---- */
-  .footer-decor {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 20px;
-    font-size: 20px;
-    opacity: 0.5;
-  }
-
-  /* ---- 弹窗 ---- */
-  .popup-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.3);
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-  .popup-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .popup {
-    background: #fff;
-    border-radius: 24px;
-    padding: 36px 28px 28px;
-    text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    max-width: 320px;
-    width: 85%;
-  }
-  .popup-emoji {
-    font-size: 56px;
-    margin-bottom: 12px;
-  }
-  .popup-text {
-    font-size: 18px;
-    color: #e8456b;
-    font-weight: 600;
-  }
-
-  /* ---- 照片弹窗 ---- */
-  .photo-popup-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 20;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s;
-  }
-  .photo-popup-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .photo-popup {
-    background: #fff;
-    border-radius: 24px;
-    padding: 24px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    max-width: 90vw;
-    width: 360px;
-    position: relative;
-    animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  @keyframes popIn {
-    0% { transform: scale(0.7); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  .photo-popup .close-btn {
-    position: absolute;
-    top: -12px;
-    right: -12px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #ff2d55;
-    color: #fff;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    line-height: 30px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(255,45,85,0.4);
-    transition: transform 0.2s;
-  }
-  .photo-popup .close-btn:hover { transform: scale(1.12); }
-  .photo-popup .close-btn:active { transform: scale(0.9); }
-
-  .photo-popup img {
+  /* ---- 模块卡片 ---- */
+  .module {
     width: 100%;
-    border-radius: 16px;
-    margin-bottom: 12px;
-    max-height: 60vh;
-    object-fit: contain;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 28px;
+    box-shadow: 0 8px 32px rgba(255,120,150,0.12), 0 2px 0 rgba(255,255,255,0.8) inset;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 2.5px solid transparent;
+  }
+  .module.open {
+    border-color: rgba(255,140,160,0.3);
+    box-shadow: 0 12px 40px rgba(255,120,150,0.2), 0 2px 0 rgba(255,255,255,0.8) inset;
   }
 
-  .photo-popup .photo-label {
-    font-size: 14px;
-    color: #e8456b;
-    font-weight: 600;
+  /* ---- 模块按钮头 ---- */
+  .mod-btn {
+    width: 100%; padding: 20px 24px;
+    display: flex; align-items: center; gap: 14px;
+    background: none; border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .mod-btn:active { background: rgba(255,120,150,0.06); }
+
+  .mod-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .mod-icon.photos { background: #fff0f5; }
+  .mod-icon.video  { background: #fff5ee; }
+  .mod-icon.letter { background: #f5f0ff; }
+
+  .mod-info { text-align: left; flex: 1; }
+  .mod-info .mod-title {
+    font-size: 18px; font-weight: 700; color: #d4446a;
+    letter-spacing: 1px;
+  }
+  .mod-info .mod-hint {
+    font-size: 12px; color: #d49ba8; margin-top: 2px;
+  }
+
+  .mod-arrow {
+    font-size: 18px; color: #e8a0b5;
+    transition: transform 0.35s;
+  }
+  .module.open .mod-arrow { transform: rotate(180deg); }
+
+  /* ---- 模块内容区 ---- */
+  .mod-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s;
+    padding: 0 24px;
+  }
+  .module.open .mod-body {
+    max-height: 600px;
+    padding: 0 24px 24px;
+  }
+
+  /* 照片区 */
+  .photo-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .photo-placeholder {
+    aspect-ratio: 1;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffe0ea, #ffd1dc);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    border: 2px dashed #ffc0d0;
+  }
+  .mod-body .tip-text {
+    text-align: center; font-size: 13px; color: #d49ba8;
+    margin-top: 12px;
+  }
+
+  /* 视频区 */
+  .video-placeholder {
+    width: 100%; aspect-ratio: 16/10;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fff0e8, #ffe8d8);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; font-size: 40px;
+    border: 2px dashed #ffd0b8;
+  }
+  .video-placeholder .play-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,140,100,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+
+  /* 信区 */
+  .letter-card {
+    background: linear-gradient(135deg, #fffdf5, #fff8f0);
+    border-radius: 16px; padding: 20px;
+    border: 1.5px solid #ffe8d0;
+    font-size: 15px; color: #a07060; line-height: 1.8;
+    position: relative;
+  }
+  .letter-card::before {
+    content: '💌';
+    position: absolute; top: -16px; right: 16px;
+    font-size: 28px;
+  }
+  .letter-card .dear {
+    font-weight: 700; font-size: 16px; color: #c06050;
+  }
+  .letter-card .sign {
+    margin-top: 12px; text-align: right;
+    font-weight: 600; color: #c08070;
   }
 
   /* ---- 音乐按钮 ---- */
   .music-btn {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 30;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
+    position: fixed; top: 20px; right: 20px; z-index: 30;
+    width: 40px; height: 40px; border-radius: 50%;
     border: 2px solid #ffccd5;
-    background: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.75);
     backdrop-filter: blur(10px);
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(255,120,150,0.12);
     transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(255,105,135,0.15);
   }
-  .music-btn:hover { transform: scale(1.08); }
   .music-btn.playing {
     border-color: #ff6b81;
-    animation: musicPulse 2s ease-in-out infinite;
+    animation: musicGlow 2s ease-in-out infinite;
   }
-  @keyframes musicPulse {
-    0%, 100% { box-shadow: 0 4px 15px rgba(255,105,135,0.15); }
-    50% { box-shadow: 0 4px 28px rgba(255,105,135,0.4); }
-  }
-
-  /* ---- 响应式 ---- */
-  @media (max-width: 420px) {
-    .card { padding: 36px 24px 28px; }
-    .message { font-size: 22px; }
-    .kitty-wrapper { width: 150px; height: 150px; }
+  @keyframes musicGlow {
+    0%, 100% { box-shadow: 0 4px 12px rgba(255,120,150,0.12); }
+    50% { box-shadow: 0 4px 24px rgba(255,120,150,0.35); }
   }
 
-  /* ---- 无障碍：减弱动画 ---- */
   @media (prefers-reduced-motion: reduce) {
-    .card { animation: none; }
-    .floating-heart { animation: none; opacity: 0; }
-    .kitty-wrapper.wiggle { animation: none; }
+    .cloud, .falling-heart, .header .icon-row { animation: none; }
     .music-btn.playing { animation: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="hearts-container" id="heartsContainer"></div>
+<div class="clouds" id="clouds"></div>
 <button class="music-btn" id="musicBtn" onclick="toggleMusic(event)" title="音乐">🎵</button>
 
-<main class="card" id="card">
-  <!-- Hello Kitty SVG -->
-  <div class="kitty-wrapper" id="kittyWrapper" onclick="tapKitty(event)">
-    <div class="tap-hint" id="tapHint">+1 💕</div>
-    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="blushL" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffb3c1" stop-opacity="0.7"/>
-          <stop offset="100%" stop-color="#ffb3c1" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="blushR" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffb3c1" stop-opacity="0.7"/>
-          <stop offset="100%" stop-color="#ffb3c1" stop-opacity="0"/>
-        </radialGradient>
-        <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#e890a0" flood-opacity="0.2"/>
-        </filter>
-      </defs>
+<main class="main-wrap">
+  <header class="header">
+    <div class="icon-row">💖</div>
+    <h1>小何专属</h1>
+    <p class="sub">每个模块都是我的心意</p>
+  </header>
 
-      <!-- 左耳 (viewer left = Kitty's left ear) -->
-      <ellipse cx="30" cy="55" rx="24" ry="26" fill="#fff" stroke="#e890a0" stroke-width="2.2" transform="rotate(-18 30 55)"/>
-      <ellipse cx="30" cy="55" rx="13" ry="15" fill="#ffe0e8" transform="rotate(-18 30 55)"/>
-
-      <!-- 右耳 (viewer right = Kitty's right ear) -->
-      <ellipse cx="170" cy="55" rx="24" ry="26" fill="#fff" stroke="#e890a0" stroke-width="2.2" transform="rotate(18 170 55)"/>
-      <ellipse cx="170" cy="55" rx="13" ry="15" fill="#ffe0e8" transform="rotate(18 170 55)"/>
-
-      <!-- 蝴蝶结 (on Kitty's right ear / viewer's right) — 经典大红蝴蝶结 -->
-      <g transform="translate(170, 30)">
-        <!-- 左瓣 -->
-        <path d="M-4,-2 C-28,-18 -32,8 -6,6" fill="#e8203b" stroke="#c41230" stroke-width="0.8"/>
-        <!-- 右瓣 -->
-        <path d="M4,-2 C28,-18 32,8 6,6" fill="#e8203b" stroke="#c41230" stroke-width="0.8"/>
-        <!-- 下飘带 (左) -->
-        <path d="M-3,5 C-10,16 -8,26 -2,28" fill="none" stroke="#e8203b" stroke-width="4" stroke-linecap="round"/>
-        <!-- 下飘带 (右) -->
-        <path d="M3,5 C10,16 8,26 2,28" fill="none" stroke="#e8203b" stroke-width="4" stroke-linecap="round"/>
-        <!-- 中心结 -->
-        <circle cx="0" cy="2" r="6.5" fill="#ff2650"/>
-        <circle cx="-1" cy="1" r="2" fill="#ff6b81" opacity="0.7"/>
-      </g>
-
-      <!-- 脸 — 经典椭圆，略宽 -->
-      <ellipse cx="100" cy="108" rx="76" ry="62" fill="#fff" stroke="#e890a0" stroke-width="2.2" filter="url(#softShadow)"/>
-
-      <!-- 左眼 — 椭圆黑豆眼 + 高光 -->
-      <ellipse cx="73" cy="98" rx="6.5" ry="8.5" fill="#1a1a1a"/>
-      <ellipse cx="75" cy="95" rx="2.2" ry="2.8" fill="#fff"/>
-
-      <!-- 右眼 -->
-      <ellipse cx="127" cy="98" rx="6.5" ry="8.5" fill="#1a1a1a"/>
-      <ellipse cx="129" cy="95" rx="2.2" ry="2.8" fill="#fff"/>
-
-      <!-- 鼻子 — 经典黄色椭圆 -->
-      <ellipse cx="100" cy="113" rx="6" ry="5" fill="#f9c440"/>
-
-      <!-- 左胡须 (3根) -->
-      <line x1="68" y1="103" x2="18" y2="96" stroke="#999" stroke-width="1.6" stroke-linecap="round"/>
-      <line x1="68" y1="112" x2="14" y2="112" stroke="#999" stroke-width="1.6" stroke-linecap="round"/>
-      <line x1="68" y1="121" x2="18" y2="128" stroke="#999" stroke-width="1.6" stroke-linecap="round"/>
-
-      <!-- 右胡须 (3根，严格对称) -->
-      <line x1="132" y1="96" x2="182" y2="103" stroke="#999" stroke-width="1.6" stroke-linecap="round"/>
-      <line x1="132" y1="112" x2="186" y2="112" stroke="#999" stroke-width="1.6" stroke-linecap="round"/>
-      <line x1="132" y1="128" x2="182" y2="121" stroke="#999" stroke-width="1.6" stroke-linecap="round"/>
-
-      <!-- 腮红 (渐变) -->
-      <ellipse cx="52" cy="117" rx="14" ry="8" fill="url(#blushL)"/>
-      <ellipse cx="148" cy="117" rx="14" ry="8" fill="url(#blushR)"/>
-    </svg>
+  <!-- 模块1: with u -->
+  <div class="module" id="modPhotos">
+    <button class="mod-btn" onclick="toggleModule('modPhotos')">
+      <div class="mod-icon photos">📸</div>
+      <div class="mod-info">
+        <div class="mod-title">with u</div>
+        <div class="mod-hint">我们的每一帧回忆</div>
+      </div>
+      <span class="mod-arrow">▼</span>
+    </button>
+    <div class="mod-body">
+      <div class="photo-grid">
+        <div class="photo-placeholder">🖼️</div>
+        <div class="photo-placeholder">🖼️</div>
+        <div class="photo-placeholder">🖼️</div>
+        <div class="photo-placeholder">🖼️</div>
+      </div>
+      <p class="tip-text">💝 把合照放进来，填满这个相册吧</p>
+    </div>
   </div>
 
-  <p class="greeting">💝 小何专属 💝</p>
-  <h1 class="message">Hi 小何，<br>今晚战况如何？</h1>
-  <p class="sub-message">—— 来自你的专属后勤部长 ✨</p>
-
-  <div class="btn-row">
-    <button class="btn btn-primary" onclick="showPopup(event)">点我 💌</button>
-    <button class="btn btn-secondary" onclick="showPigPopup(event)">查看养猪秘诀 🐷</button>
+  <!-- 模块2: gift -->
+  <div class="module" id="modVideo">
+    <button class="mod-btn" onclick="toggleModule('modVideo')">
+      <div class="mod-icon video">🎬</div>
+      <div class="mod-info">
+        <div class="mod-title">gift</div>
+        <div class="mod-hint">一段想对你说的话</div>
+      </div>
+      <span class="mod-arrow">▼</span>
+    </button>
+    <div class="mod-body">
+      <div class="video-placeholder">
+        <div class="play-icon">▶️</div>
+        <span style="font-size:14px;color:#c09070;">视频占位 — 上传你的视频</span>
+      </div>
+      <p class="tip-text">🎁 录一段想对她说的话吧</p>
+    </div>
   </div>
 
-  <div class="footer-decor">
-    🎀 🐱 🌸 🎀 🐱 🌸
+  <!-- 模块3: letter -->
+  <div class="module" id="modLetter">
+    <button class="mod-btn" onclick="toggleModule('modLetter')">
+      <div class="mod-icon letter">💌</div>
+      <div class="mod-info">
+        <div class="mod-title">letter</div>
+        <div class="mod-hint">一封手写的信</div>
+      </div>
+      <span class="mod-arrow">▼</span>
+    </button>
+    <div class="mod-body">
+      <div class="letter-card">
+        <p class="dear">亲爱的小何：</p>
+        <br>
+        <p>这封信的位置，我预留给你。</p>
+        <p>写下你想对她说的话，</p>
+        <p>肉麻一点也没关系。</p>
+        <br>
+        <p>她会懂的。</p>
+        <p class="sign">—— 你的专属后勤部长 💖</p>
+      </div>
+    </div>
   </div>
+
 </main>
 
-<!-- 照片弹窗 -->
-<div class="photo-popup-overlay" id="photoPopupOverlay" onclick="hidePigPopup()">
-  <div class="photo-popup" onclick="event.stopPropagation()">
-    <button class="close-btn" onclick="hidePigPopup()">✕</button>
-    <img src="photo.jpg" alt="养猪秘诀 🐷">
-    <p class="photo-label">🐷 我养的猪，谁也别想抢走 💖</p>
-  </div>
-</div>
-
-<!-- 弹窗 -->
-<div class="popup-overlay" id="popupOverlay" onclick="hidePopup()">
-  <div class="popup" onclick="event.stopPropagation()">
-    <div class="popup-emoji">💖</div>
-    <p class="popup-text">你永远是我的<br>最棒的女朋友~</p>
-  </div>
-</div>
-
 <script>
-  const heartsContainer = document.getElementById('heartsContainer');
-  const kittyWrapper = document.getElementById('kittyWrapper');
-  const tapHint = document.getElementById('tapHint');
-  const emojis = ['💖', '💕', '💗', '🌸', '🎀', '💝', '✨', '💓'];
-  const burstEmojis = ['💖', '💕', '💗', '💘', '💝', '💓', '✨', '🌸', '🎀'];
-  let tapCount = 0;
+  // ---- 模块折叠 ----
+  function toggleModule(id) {
+    const mod = document.getElementById(id);
+    const isOpen = mod.classList.contains('open');
+    // 关闭所有
+    document.querySelectorAll('.module.open').forEach(m => m.classList.remove('open'));
+    // 打开当前（除非它本来开着）
+    if (!isOpen) mod.classList.add('open');
+  }
 
-  // ---- 背景飘落的小心心 ----
-  function createFloatingHeart() {
+  // ---- 飘落的爱心 ----
+  const heartsEmoji = ['💖', '💕', '💗', '🌸', '✨', '💝'];
+  function spawnHeart() {
     const el = document.createElement('span');
-    el.className = 'floating-heart';
-    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.className = 'falling-heart';
+    el.textContent = heartsEmoji[Math.floor(Math.random() * heartsEmoji.length)];
     el.style.left = Math.random() * 95 + '%';
-    el.style.animationDuration = (6 + Math.random() * 8) + 's';
+    el.style.fontSize = (16 + Math.random() * 24) + 'px';
+    el.style.animationDuration = (8 + Math.random() * 12) + 's';
     el.style.animationDelay = Math.random() * 5 + 's';
-    el.style.fontSize = (18 + Math.random() * 30) + 'px';
-    heartsContainer.appendChild(el);
+    document.body.appendChild(el);
     el.addEventListener('animationend', () => el.remove());
   }
+  for (let i = 0; i < 14; i++) spawnHeart();
+  setInterval(spawnHeart, 1500);
 
-  for (let i = 0; i < 18; i++) createFloatingHeart();
-  setInterval(createFloatingHeart, 1200);
-
-  function refloatHearts() {
-    for (let i = 0; i < 15; i++) {
-      setTimeout(createFloatingHeart, i * 70);
-    }
+  // ---- 云朵 ----
+  const clouds = document.getElementById('clouds');
+  function spawnCloud() {
+    const c = document.createElement('div');
+    c.className = 'cloud';
+    const w = 60 + Math.random() * 100;
+    const h = w * 0.5;
+    c.style.width = w + 'px';
+    c.style.height = h + 'px';
+    c.style.top = (5 + Math.random() * 70) + '%';
+    c.style.animationDuration = (25 + Math.random() * 40) + 's';
+    clouds.appendChild(c);
+    c.addEventListener('animationend', () => c.remove());
   }
+  for (let i = 0; i < 6; i++) { spawnCloud(); }
+  setInterval(spawnCloud, 20000);
 
-  // ---- 点击空白处爆发小心心 ----
-  document.addEventListener('click', function(e) {
-    // 排除按钮和Kitty（Kitty有自己的交互）
-    if (e.target.closest('button') || e.target.closest('.kitty-wrapper') || e.target.closest('.popup')) return;
-    burstHearts(e.clientX, e.clientY);
-  });
-
-  function burstHearts(x, y, count = 8) {
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('span');
-      el.className = 'burst-heart';
-      el.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
-      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
-      const dist = 50 + Math.random() * 80;
-      el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-      el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-      el.style.fontSize = (16 + Math.random() * 24) + 'px';
-      el.style.animationDuration = (0.7 + Math.random() * 0.6) + 's';
-      document.body.appendChild(el);
-      el.addEventListener('animationend', () => el.remove());
-    }
-  }
-
-  // ---- 点击 Kitty 互动 ----
-  function tapKitty(event) {
-    event.stopPropagation();
-    tapCount++;
-
-    // 摇晃
-    kittyWrapper.classList.remove('wiggle');
-    void kittyWrapper.offsetWidth; // reflow
-    kittyWrapper.classList.add('wiggle');
-
-    // 弹出 +1
-    tapHint.classList.add('show');
-    tapHint.textContent = tapCount === 1 ? '+1 💕' :
-                          tapCount === 5 ? '好喜欢 💗' :
-                          tapCount === 10 ? '停不下来 😻' :
-                          tapCount === 20 ? '你是最棒的 🎀' :
-                          '+' + tapCount + ' 💕';
-    setTimeout(() => tapHint.classList.remove('show'), 1200);
-
-    // 从 Kitty 位置爆爱心
-    const rect = kittyWrapper.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    burstHearts(cx, cy, 10);
-  }
-
-  // ---- 弹窗 ----
-  function showPopup(event) {
-    event.stopPropagation();
-    document.getElementById('popupOverlay').classList.add('show');
-  }
-
-  function hidePopup() {
-    document.getElementById('popupOverlay').classList.remove('show');
-  }
-
-  // ---- 照片弹窗 ----
-  function showPigPopup(event) {
-    event.stopPropagation();
-    document.getElementById('photoPopupOverlay').classList.add('show');
-    burstHearts(event.clientX, event.clientY, 12);
-  }
-
-  function hidePigPopup() {
-    document.getElementById('photoPopupOverlay').classList.remove('show');
-  }
-
-  // ---- 音乐播放器 (舒缓音乐盒，约 30s 循环) ----
-  let audioCtx = null;
-  let musicPlaying = false;
-  let musicTimer = null;
+  // ---- 音乐播放器 ----
+  let audioCtx = null, musicPlaying = false, musicTimer = null;
   const musicBtn = document.getElementById('musicBtn');
 
-  const melodyA = [
-    // 乐句1 — 轻柔上行
+  const melody = [
     { f: 523.25, d: 0.55 }, { f: 587.33, d: 0.30 }, { f: 659.25, d: 0.55 }, { f: 783.99, d: 0.55 },
-    { f: 880.00, d: 0.80 }, { f: 783.99, d: 0.35 }, { f: 659.25, d: 0.30 },
-    { f: 0, d: 0.25 },
-    // 乐句2 — 下行回旋
+    { f: 880.00, d: 0.80 }, { f: 783.99, d: 0.35 }, { f: 659.25, d: 0.30 }, { f: 0, d: 0.25 },
     { f: 659.25, d: 0.55 }, { f: 587.33, d: 0.30 }, { f: 523.25, d: 0.55 }, { f: 659.25, d: 0.55 },
-    { f: 587.33, d: 0.80 }, { f: 523.25, d: 0.35 }, { f: 440.00, d: 0.30 },
-    { f: 0, d: 0.30 },
-    // 乐句3 — 展开
+    { f: 587.33, d: 0.80 }, { f: 523.25, d: 0.35 }, { f: 440.00, d: 0.30 }, { f: 0, d: 0.30 },
     { f: 440.00, d: 0.55 }, { f: 523.25, d: 0.30 }, { f: 587.33, d: 0.55 }, { f: 659.25, d: 0.55 },
     { f: 783.99, d: 0.55 }, { f: 659.25, d: 0.55 }, { f: 783.99, d: 0.55 }, { f: 880.00, d: 0.55 },
     { f: 0, d: 0.30 },
-    // 乐句4 — 高潮
     { f: 880.00, d: 0.55 }, { f: 783.99, d: 0.30 }, { f: 1046.50, d: 0.55 }, { f: 880.00, d: 0.55 },
-    { f: 783.99, d: 0.80 }, { f: 659.25, d: 0.35 }, { f: 587.33, d: 0.30 },
-    { f: 0, d: 0.30 },
-    // 乐句5 — 回归
+    { f: 783.99, d: 0.80 }, { f: 659.25, d: 0.35 }, { f: 587.33, d: 0.30 }, { f: 0, d: 0.30 },
     { f: 659.25, d: 0.55 }, { f: 587.33, d: 0.30 }, { f: 523.25, d: 0.55 }, { f: 587.33, d: 0.55 },
     { f: 659.25, d: 0.55 }, { f: 523.25, d: 0.55 }, { f: 440.00, d: 0.55 }, { f: 523.25, d: 0.55 },
     { f: 0, d: 0.25 },
-    // 乐句6 — 收尾
     { f: 523.25, d: 0.55 }, { f: 659.25, d: 0.55 }, { f: 587.33, d: 0.55 }, { f: 523.25, d: 0.55 },
-    { f: 440.00, d: 1.00 },
-    { f: 0, d: 0.80 },
+    { f: 440.00, d: 1.00 }, { f: 0, d: 0.80 },
   ];
 
   function playNote(freq, dur) {
     if (!audioCtx || !musicPlaying) return;
     const now = audioCtx.currentTime;
-    // 主音 — 柔和的 sine 波
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = 'sine';
@@ -616,8 +390,6 @@
     gain.connect(audioCtx.destination);
     osc.start(now);
     osc.stop(now + dur + 0.08);
-
-    // 泛音层 — 高八度，增加晶莹感
     if (freq > 0) {
       const osc2 = audioCtx.createOscillator();
       const gain2 = audioCtx.createGain();
@@ -636,14 +408,12 @@
   function playMelody() {
     if (!musicPlaying) return;
     let delay = 0;
-    melodyA.forEach(n => {
-      if (n.f > 0) {
-        setTimeout(() => playNote(n.f, n.d), delay * 1000);
-      }
+    melody.forEach(n => {
+      if (n.f > 0) setTimeout(() => playNote(n.f, n.d), delay * 1000);
       delay += n.d;
     });
-    const totalDur = melodyA.reduce((s, n) => s + n.d, 0);
-    musicTimer = setTimeout(playMelody, (totalDur + 1.0) * 1000);
+    const total = melody.reduce((s, n) => s + n.d, 0);
+    musicTimer = setTimeout(playMelody, (total + 1.0) * 1000);
   }
 
   function startMusic() {
@@ -665,36 +435,13 @@
 
   function toggleMusic(event) {
     event.stopPropagation();
-    if (musicPlaying) { stopMusic(); }
-    else { startMusic(); }
+    musicPlaying ? stopMusic() : startMusic();
   }
 
-  let musicAutoStarted = false;
-  document.addEventListener('click', function autoStart() {
-    if (musicAutoStarted) return;
-    musicAutoStarted = true;
-    startMusic();
+  let autoStarted = false;
+  document.addEventListener('click', () => {
+    if (!autoStarted) { autoStarted = true; startMusic(); }
   }, { once: false });
-
-  // ---- 移动端触摸滑动时的小尾巴 ----
-  let touchTrailTimer = null;
-  document.addEventListener('touchmove', function(e) {
-    if (e.target.closest('button') || e.target.closest('.popup')) return;
-    if (touchTrailTimer) return;
-    touchTrailTimer = setTimeout(() => { touchTrailTimer = null; }, 150);
-    const touch = e.touches[0];
-    const el = document.createElement('span');
-    el.className = 'burst-heart';
-    el.textContent = '✨';
-    el.style.left = touch.clientX + 'px';
-    el.style.top = touch.clientY + 'px';
-    el.style.fontSize = '14px';
-    el.style.setProperty('--dx', (Math.random() - 0.5) * 40 + 'px');
-    el.style.setProperty('--dy', (Math.random() - 0.5) * 40 + 'px');
-    el.style.animationDuration = '0.6s';
-    document.body.appendChild(el);
-    el.addEventListener('animationend', () => el.remove());
-  }, { passive: true });
 </script>
 
 </body>
